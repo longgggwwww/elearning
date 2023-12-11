@@ -25,11 +25,11 @@ app.use("/upload", express.static("upload"));
 
 app.use(
   cors({
-    // origin: ["*", "https://e-learning-gd.netlify.app"],
+    origin: ["*", "http://localhost:3031"],
   })
 );
 app.use(helmet());
-app.use(express.json());
+app.use(express.json({ limit: 1200 * 1024 * 1024 }));
 
 app.use(authRouter);
 app.use(provRouter);
