@@ -6,7 +6,7 @@ let io;
 function createSock(ws) {
   io = new socketio.Server(ws, {
     cors: {
-      origin: ["https://elearning.gdvietnam.com"],
+      origin: ["*", "http://localhost:3000"],
     },
   });
 
@@ -95,6 +95,10 @@ function createSock(ws) {
       console.log("Join room event: ", socket.id, roomId);
       socket.join(roomId);
     });
+
+    socket.on("lock", (userId, status) => {
+      io.to(userId).emit("lock", status)
+    })
 
     socket.on("leave-room", (roomId) => {
       socket.leave(roomId);
