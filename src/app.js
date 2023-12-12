@@ -51,6 +51,8 @@ app.all("*", (req, res) => {
   throw new NotFoundErr("Yêu cầu không tồn tại");
 });
 
+console.log("new version");
+
 app.use(errHandler);
 
 module.exports = app;
