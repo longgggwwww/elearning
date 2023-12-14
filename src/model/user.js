@@ -6,6 +6,10 @@ const { MALE, FEMALE, OTHER } = gender;
 
 const schema = new mongoose.Schema(
   {
+    lock: {
+      type: Boolean,
+      default: false,
+    },
     username: {
       type: String,
       required: true,
@@ -104,9 +108,7 @@ schema.index({ createdAt: -1 });
 // Mã hóa mật khẩu trước khi lưu
 schema.pre("save", async function (fn) {
   if (this.isModified("password")) {
-    const hashed = await Password.toHash(
-      this.get("password")
-    );
+    const hashed = await Password.toHash(this.get("password"));
     this.set("password", hashed);
   }
   fn();

@@ -1,12 +1,13 @@
 const socketio = require("socket.io");
 const Group = require("../model/group");
+const User = require("../model/user");
 
 let io;
 
 function createSock(ws) {
   io = new socketio.Server(ws, {
     cors: {
-      origin: ["*", "http://localhost:3000"],
+      origin: ["*", "http://localhost:3031", "https://ngoaingu.iit.vn"],
     },
   });
 
@@ -34,7 +35,6 @@ function createSock(ws) {
     console.log("namespace /stream", socket.id);
 
     socket.on("join room", async (roomID, name) => {
-      console.log("Fix bug cua khua Luan");
       //  Lấy roomID và username
       socket.data.username = name;
 
@@ -96,9 +96,26 @@ function createSock(ws) {
       socket.join(roomId);
     });
 
-    socket.on("lock", (userId, status) => {
-      io.to(userId).emit("lock", status)
-    })
+    socket.on("answerCall", (data) => {});
+
+    socket.on("callUser", (data) => {});
+
+    socket.on("remote", (userIds, type, data) => {
+      io.to(userIds).emit("remote", type, data);
+    });
+
+    socket.on("lock", async (userId, status) => {
+      await User.findByIdAndUpdate(userId, {
+        $set: {
+          lock: status,
+        },
+      });
+      io.to(userId).emit("lock", status);
+    });
+
+    socket.on("share", (userId) => {
+      io.to(userId).emit("share");
+    });
 
     socket.on("leave-room", (roomId) => {
       socket.leave(roomId);
@@ -122,10 +139,7 @@ function createSock(ws) {
         }
 
         if (group.isStream) {
-          io.to(group._id.toString()).emit(
-            "on-stream",
-            group
-          );
+          io.to(group._id.toString()).emit("on-stream", group);
         }
       } catch (err) {
         console.log(err);
@@ -151,10 +165,7 @@ function createSock(ws) {
         }
 
         if (!group.isStream) {
-          io.to(group._id.toString()).emit(
-            "off-stream",
-            group
-          );
+          io.to(group._id.toString()).emit("off-stream", group);
         }
       } catch (err) {
         console.log(err);

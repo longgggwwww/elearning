@@ -25,7 +25,7 @@ app.use("/upload", express.static("upload"));
 
 app.use(
   cors({
-    origin: ["*", "http://localhost:3031"],
+    origin: ["*", "http://localhost:3031", "https://ngoaingu.iit.vn"],
   })
 );
 app.use(helmet());
@@ -47,11 +47,13 @@ app.use(gameRouter);
 app.use(cmtRouter);
 app.use(notiRouter);
 
+app.get("/v", (req, res) => {
+  res.send("v2.2");
+});
+
 app.all("*", (req, res) => {
   throw new NotFoundErr("Yêu cầu không tồn tại");
 });
-
-console.log("new version");
 
 app.use(errHandler);
 
